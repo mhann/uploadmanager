@@ -13,13 +13,15 @@ var (
 
 type QueueItem struct {
   FileName string
+  BaseDirectory string
   Redundancy int
   State int // 0 = waiting, 1 = started, 2 = finished
   StateChangeTime time.Time
 }
 
-func AddToQueue(filename string, redundancy int) {
-  item := &QueueItem{FileName: filename, Redundancy: redundancy}
+func AddToQueue(item *QueueItem) {
+  item.State = 0
+  item.StateChangeTime = time.Now()
   queueMutex.Lock()
   // This is inefficient af but the queue shouldn't be too long.
   for _, item := range queue {

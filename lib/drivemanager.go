@@ -64,7 +64,7 @@ func TriggerError(drive *Drive) {
 func GetDriveSize(drive *drive.Service) uint64 {
   about, err := drive.About.Get().Fields("storageQuota/usage").Do()
   if err != nil {
-    log.Fatalf("Unable to get drive usage: %v", err)
+    log.Printf("Unable to get drive usage: %v", err)
   }
 
   return uint64(about.StorageQuota.Usage)
@@ -79,7 +79,7 @@ func GetSizeSortedDrives() DriveList {
   return connectedDrives
 }
 
-func AddDrive(name string, authentication DriveAdd) {
+func AddDrive(name string, authentication DriveAdd) error {
   drive := Drive{Name: name}
   driveStats := DriveStats{}
   drive.Stats = &driveStats
@@ -87,10 +87,17 @@ func AddDrive(name string, authentication DriveAdd) {
   drive.Root = authentication.Root
   log.Printf("Set root of %s to %s", name, drive.Root)
 
-  srv := Authorize(&authentication, name)
+  srv, err := Authorize(&authentication, name)
+  if err != nil {
+    log.Printf("Error adding drive: %v", err)
+    return err
+  }
+
   drive.Service = srv
 
   drive.Stats.Usage = GetDriveSize(srv)
 
   connectedDrives = append(connectedDrives, &drive)
+
+  return nil
 }

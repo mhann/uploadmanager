@@ -8,29 +8,30 @@ import (
 
 func UploadPath(path string, redundancy int) {
   for {
-    var uploadFiles = []string{}
     var directories = []string{path}
 
+    // The following code performs a breadth first search for files in the provided path.
     for len(directories) != 0 {
       currentPath := directories[0]
       directories = directories[1:]
 
       files, err := ioutil.ReadDir(currentPath)
       if err != nil {
-        log.Fatalf("Error getting list of files in directory %s: %v", path, err)
+        log.Printf("Error getting list of files in directory %s: %v", path, err)
+        continue
       }
 
       for _, file := range files {
         if file.IsDir() {
           directories = append(directories, currentPath + "/" + file.Name())
         } else {
-          uploadFiles = append(uploadFiles, currentPath + "/" + file.Name())
+          uploadFiles := &QueueItem{}
+          uploadFiles.FileName = currentPath + "/" + file.Name()
+          uploadFiles.BaseDirectory = path
+          uploadFiles.redundancy = redundancy
+          AddToQueue(uploadFiles)
         }
       }
-    }
-
-    for _, file := range uploadFiles {
-      AddToQueue(file, redundancy)
     }
 
     time.Sleep(120 * time.Second)
