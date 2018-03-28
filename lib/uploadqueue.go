@@ -24,8 +24,8 @@ func AddToQueue(item *QueueItem) {
   item.StateChangeTime = time.Now()
   queueMutex.Lock()
   // This is inefficient af but the queue shouldn't be too long.
-  for _, item := range queue {
-    if item.FileName == filename {
+  for _, queueItem := range queue {
+    if item.FileName == queueItem.FileName {
       queueMutex.Unlock()
       return
     }

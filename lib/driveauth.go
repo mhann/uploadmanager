@@ -110,7 +110,11 @@ func Authorize(driveDetails *DriveAdd, name string) (*drive.Service, error) {
   config.RedirectURL = "urn:ietf:wg:oauth:2.0:oob"
   config.Scopes = []string{drive.DriveMetadataReadonlyScope, drive.DriveScope}
 
-  client := getClient(ctx, &config, name)
+  client, err := getClient(ctx, &config, name)
+  if err != nil {
+    log.Printf("Imable to retrieve drive client: %v", err)
+    return nil, err
+  }
 
   srv, err := drive.New(client)
   if err != nil {

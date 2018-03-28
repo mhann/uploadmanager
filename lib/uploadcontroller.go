@@ -28,7 +28,7 @@ func UploadPath(path string, redundancy int) {
           uploadFiles := &QueueItem{}
           uploadFiles.FileName = currentPath + "/" + file.Name()
           uploadFiles.BaseDirectory = path
-          uploadFiles.redundancy = redundancy
+          uploadFiles.Redundancy = redundancy
           AddToQueue(uploadFiles)
         }
       }

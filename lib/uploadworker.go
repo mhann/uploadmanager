@@ -25,7 +25,6 @@ func StartWorker() {
     }
 
     if workItem != nil {
-      log.Println("Uploading: " + workItem.FileName)
       err := uploadFile(googleDrive, workItem.FileName)
 
       if err != nil {
@@ -43,10 +42,7 @@ func StartWorker() {
 }
 
 func getOrCreateFolder(gdrive *Drive, folderName string) (string, error){
-  log.Println("Getting drive root.....")
-  log.Println(gdrive)
   rootGDriveFolder := gdrive.Root
-  log.Println("done")
   rootLocalFolder := "/home/local/"
 
   gdriveService := gdrive.Service
@@ -67,7 +63,6 @@ func getOrCreateFolder(gdrive *Drive, folderName string) (string, error){
     }
 
     if len(files.Files) > 0 {
-      log.Println(files.Files[0].Name)
       lastRoot = files.Files[0].Id
     } else {
       file, _ := gdriveService.Files.Create(&drive.File{Name: folder, Description: "Plex", MimeType: "application/vnd.google-apps.folder", Parents: []string{lastRoot}}).Do()
@@ -101,14 +96,12 @@ func uploadFile(gdrive *Drive, fileName string) error {
     f.Parents = []string{parentId}
   }
 
-  log.Printf("%s - Uploading file", fileBaseName)
   file, err := gdrive.Service.Files.Create(f).Media(input).Do()
   if err != nil {
     log.Printf("%s - Error uploading file: %v", fileBaseName, err)
     return err
   }
-  log.Printf("%s - Uploaded file", fileBaseName)
-  log.Printf("%s - Checking that the checksum matches", fileBaseName)
+  log.Printf("Uploaded file: %s", fileBaseName)
 
   h := md5.New()
   if _, err := io.Copy(h, input); err != nil {
@@ -117,8 +110,8 @@ func uploadFile(gdrive *Drive, fileName string) error {
   }
 
   if string(h.Sum(nil)) != file.Md5Checksum {
-    log.Printf("%s - Valid upload - deleting", fileBaseName)
     os.Remove(fileName)
+    log.Printf("Deleting file: %s", fileBaseName)
   } else {
     log.Printf("%s - Upload failed - not deleting", fileBaseName)
   }

@@ -2,7 +2,6 @@ package main
 
 import (
   "log"
-  "fmt"
 
   "github.com/mhann/uploadmanager/lib"
   "github.com/dustin/go-humanize"
@@ -38,7 +37,7 @@ func main() {
 
   log.Println("CurrentUsagesAcrossDrives:")
   for _, drive := range uploadmanager.GetSizeSortedDrives() {
-    log.Printf("%s: %s" drive.Name, humanize.Bytes(drive.Stats.Usage))
+    log.Printf("%s: %s", drive.Name, humanize.Bytes(drive.Stats.Usage))
   }
 
   log.Printf("Starting %d workers", viper.GetInt("workers"))
